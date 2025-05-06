@@ -1,4 +1,4 @@
-#include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <WebSocketsClient.h>
 #include <PulseSensorPlayground.h>
 
@@ -32,7 +32,7 @@ void setup() {
   Serial.println("\n Conectado al WiFi!");
 
   
-  webSocket.begin(websocket_server, websocket_port, websocket_path);
+  webSocket.beginSSL(websocket_server, websocket_port, websocket_path);
   webSocket.onEvent(webSocketEvent);     
   webSocket.setReconnectInterval(5000); 
 
@@ -83,19 +83,20 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
     case WStype_DISCONNECTED:
       Serial.println("❌ Desconectado del WebSocket!");
       break;
-    case WStype_CONNECTED:
+    case WStype_CONNECTED:{
       Serial.println("✅ Conectado al WebSocket!");
 
       // Opcional
       String subscribeMessage = "{";
       subscribeMessage += "\"type\": \"subscribe\",";
-      subscribeMessage += "\"channel\": \"CANAL1\""; 
+      subscribeMessage += "\"channel\": \"CANAL2\","; 
       subscribeMessage += "\"name\": \"ESP32-CLIENT1\""; 
       subscribeMessage += "}";
 
       Serial.println("➡️ Enviando suscripción WebSocket: " + subscribeMessage);
       webSocket.sendTXT(subscribeMessage);
       break;
+    }
     case WStype_TEXT:
       Serial.println("📩 Mensaje recibido del servidor: " + String((char*)payload));
       break;
